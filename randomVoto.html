@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting App with Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #image-list {
+            display: flex; /* Usa flexbox per il layout orizzontale */
+            justify-content: center; /* Centra le immagini */
+            flex-wrap: wrap; /* Permette la rottura a più righe se necessario */
+        }
+        .image-container {
+            margin: 10px; /* Spazio tra le immagini */
+            text-align: center;
+        }
+        img {
+            border-radius: 10px; /* Angoli arrotondati per le immagini */
+            height: 200px; /* Altezza fissa per le immagini */
+            width: auto; /* Mantiene la proporzione */
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #00b386;
+            color: white;
+            transition: background-color 0.3s;
+            margin-top: 10px; /* Margine tra i bottoni */
+        }
+        button:hover {
+            background-color:  #00ffdde3;
+        }
+        #summary {
+            margin-top: 20px;
+            display: none; /* Nascondi inizialmente il riepilogo */
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombra leggera */
+            padding: 20px; /* Padding interno */
+            width: 80%; /* Larghezza del riepilogo */
+            max-width: 600px; /* Larghezza massima */
+        }
+        table {
+            width: 100%; /* Tabella al 100% */
+            border-collapse: collapse; /* Elimina gli spazi tra i bordi */
+        }
+        th, td {
+            padding: 15px; /* Maggiore padding per le celle */
+            text-align: left;
+            border-bottom: 1px solid #ddd; /* Linea sotto ogni riga */
+        }
+        th {
+            background-color: #00b386; /* Colore di sfondo per intestazione */
+            color: white; /* Colore del testo per intestazione */
+        }
+        td {
+            width: 60%; /* Colonna commento più larga */
+        }
+        .score-input, .comment-input {
+            padding: 10px; /* Maggiore padding per gli input */
+            margin-top: 5px; /* Margine superiore per separare dall'immagine */
+            width: calc(100% - 22px); /* Allarga l'input */
+            max-width: 200px; /* Larghezza massima per mantenere il layout */
+            border: 1px solid #ccc; /* Bordo per gli input */
+            border-radius: 5px; /* Angoli arrotondati */
+        }
+        #average-rating {
+            margin-top: 20px;
+            font-size: 18px; /* Dimensione del font per la media */
+            font-weight: bold; /* Grassetto */
+            color: #333; /* Colore del testo */
+            text-align: center; /* Centro il testo */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Vota le Immagini!</h1>
+
+    <div id="image-list">
+        <!-- Immagini con commenti e voti -->
+        <div class="image-container">
+            <img src="https://cdn.pixabay.com/photo/2021/01/05/01/15/home-5889366_960_720.jpg" alt="Home">
+            <div class="comment-entry">
+                <input type="number" min="1" max="5" placeholder="Voto (1-5)" class="score-input">
+                <input type="text" placeholder="Commento" class="comment-input">
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="https://cdn.pixabay.com/photo/2018/04/12/16/35/fantasy-3313964_960_720.jpg" alt="Fantasy">
+            <div class="comment-entry">
+                <input type="number" min="1" max="5" placeholder="Voto (1-5)" class="score-input">
+                <input type="text" placeholder="Commento" class="comment-input">
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="https://cdn.pixabay.com/photo/2022/10/19/16/13/house-7532959_960_720.jpg" alt="house">
+            <div class="comment-entry">
+                <input type="number" min="1" max="5" placeholder="Voto (1-5)" class="score-input">
+                <input type="text" placeholder="Commento" class="comment-input">
+            </div>
+        </div>
+        <div class="image-container">
+            <img src="https://cdn.pixabay.com/photo/2017/12/30/08/41/fantasy-3049543_960_720.jpg" alt="Fantasy">
+            <div class="comment-entry">
+                <input type="number" min="1" max="5" placeholder="Voto (1-5)" class="score-input">
+                <input type="text" placeholder="Commento" class="comment-input">
+            </div>
+        </div>
+    </div>
+
+    <button id="submit-button">Fine votazione</button>
+    <div id="summary">
+        <h2>Riepilogo dei Voti</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Commento</th>
+                    <th>Punteggio</th>
+                </tr>
+            </thead>
+            <tbody id="comment-list"></tbody>
+        </table>
+        <button id="sort-button">Ordina per Punteggio</button>
+        <p id="average-rating"></p>
+    </div>
+
+
+
+    <script>
+        const comments = []; // Array per memorizzare i commenti e i punteggi
+
+        document.getElementById('submit-button').onclick = async () => {
+            const scoreInputs = document.querySelectorAll('.score-input');
+            const commentInputs = document.querySelectorAll('.comment-input');
+
+            // Raccogliere i dati degli input
+            scoreInputs.forEach((input, index) => {
+                const score = parseFloat(input.value);
+                const comment = commentInputs[index].value;
+                if (!isNaN(score) && comment) {
+                    comments.push({ score, comment });
+                }
+            });
+
+            try {
+                await updateSummary(); // Mostra il riepilogo e gestisce gli errori
+            } catch (error) {
+                console.error("Errore durante l'aggiornamento del riepilogo:", error);
+            }
+        };
+
+        function updateSummary() {
+            const commentList = document.getElementById('comment-list');
+            commentList.innerHTML = ''; // Pulisci la lista
+
+            comments.forEach(entry => {
+                const listItem = document.createElement('tr'); // Crea una nuova riga
+                listItem.innerHTML = `<td>${entry.comment}</td><td>${entry.score}</td>`; // Aggiungi commento e punteggio
+                commentList.appendChild(listItem);
+            });
+
+            const average = calculateAverage();
+            document.getElementById('average-rating').innerText = `Media dei punteggi: ${average.toFixed(2)}`;
+            document.getElementById('summary').style.display = 'block'; // Mostra il riepilogo
+        }
+
+        function calculateAverage() {
+            if (comments.length === 0) return 0;
+            const total = comments.reduce((sum, entry) => sum + entry.score, 0);
+            return total / comments.length;
+        }
+
+        document.getElementById('sort-button').onclick = () => {
+            comments.sort((a, b) => b.score - a.score); // Ordina per punteggio decrescente
+            updateSummary(); // Rinfresca il riepilogo
+        };
+    </script>
+</body>
+</html>
