@@ -1,1 +1,1 @@
-Immagini gratuita da PIXABAY https://pixabay.com/it/
+Immagini gratuite da PIXABAY https://pixabay.com/it/
